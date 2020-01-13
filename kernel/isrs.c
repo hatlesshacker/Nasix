@@ -35,8 +35,7 @@ extern void isr29();
 extern void isr30();
 extern void isr31();
 
-void isrs_install()
-{
+void isrs_install() {
     idt_set_gate(0, (unsigned)isr0, 0x08, 0x8E);
     idt_set_gate(1, (unsigned)isr1, 0x08, 0x8E);
     idt_set_gate(2, (unsigned)isr2, 0x08, 0x8E);
@@ -74,8 +73,7 @@ void isrs_install()
     idt_set_gate(31, (unsigned)isr31, 0x08, 0x8E);
 }
 
-unsigned char *exception_messages[] =
-{
+unsigned char *exception_messages[] = {
     "Division By Zero",
     "Debug",
     "Non Maskable Interrupt",
@@ -113,10 +111,8 @@ unsigned char *exception_messages[] =
     "Reserved"
 };
 
-void fault_handler(struct regs *r)
-{
-    if (r->int_no < 32)
-    {
+void fault_handler(struct regs *r) {
+    if (r->int_no < 32) {
         kputs(exception_messages[r->int_no]);
         kputs(" Exception. System Halted!\n");
         for (;;);

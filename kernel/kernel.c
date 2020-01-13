@@ -9,25 +9,24 @@ unsigned short getram();
 inline void outportb (unsigned short _port, unsigned char _data) {
     asm volatile ("outb %1, %0" : : "dN" (_port), "a" (_data));
 }
-unsigned char inportb (unsigned short _port)
-{
+unsigned char inportb (unsigned short _port) {
     unsigned char rv;
     __asm__ __volatile__ ("inb %1, %0" : "=a" (rv) : "dN" (_port));
     return rv;
 }
 
-void kmain()
-{
-  gdt_install();
-  idt_install();
-  isrs_install();
-  irq_install();
-  asm volatile ("sti");
-  keyboard_install();
-  cls();
+void kmain() {
+    gdt_install();
+    idt_install();
+    isrs_install();
+    irq_install();
+    asm volatile ("sti");
+    keyboard_install();
+    cls();
 
-  kputs("Hello World!\n");
-  kputs(get_cpuvendor());
-  
-  for (;;);
+    kputs("Hello World!\n");
+    kputs(get_cpuvendor());
+    kputs("\n");
+
+    for (;;);
 }

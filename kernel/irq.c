@@ -20,24 +20,20 @@ extern void irq13();
 extern void irq14();
 extern void irq15();
 
-void *irq_routines[16] =
-{
+void *irq_routines[16] = {
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0
 };
 
-void irq_install_handler(int irq, void (*handler)(struct regs *r))
-{
+void irq_install_handler(int irq, void (*handler)(struct regs *r)) {
     irq_routines[irq] = handler;
 }
 
-void irq_uninstall_handler(int irq)
-{
+void irq_uninstall_handler(int irq) {
     irq_routines[irq] = 0;
 }
 
-void irq_remap(void)
-{
+void irq_remap(void) {
     outportb(0x20, 0x11);
     outportb(0xA0, 0x11);
     outportb(0x21, 0x20);
@@ -50,8 +46,7 @@ void irq_remap(void)
     outportb(0xA1, 0x0);
 }
 
-void irq_install()
-{
+void irq_install() {
     irq_remap();
 
     idt_set_gate(32, (unsigned)irq0, 0x08, 0x8E);
@@ -73,19 +68,16 @@ void irq_install()
     idt_set_gate(47, (unsigned)irq15, 0x08, 0x8E);
 }
 
-void irq_handler(struct regs *r)
-{
+void irq_handler(struct regs *r) {
     /* This is a blank function pointer */
     void (*handler)(struct regs *r);
 
     handler = irq_routines[r->int_no - 32];
-    if (handler)
-    {
+    if (handler) {
         handler(r);
     }
 
-    if (r->int_no >= 40)
-    {
+    if (r->int_no >= 40) {
         outportb(0xA0, 0x20);
     }
     outportb(0x20, 0x20);
