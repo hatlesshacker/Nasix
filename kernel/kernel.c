@@ -24,9 +24,7 @@ void kmain() {
     keyboard_install();
     cls();
 
-    kputs("Hello World!\n");
-    kputs(get_cpuvendor());
-    kputs("\n");
+    printk("CPU Vendor: %s\n", get_cpuvendor());
 
     for (;;);
 }

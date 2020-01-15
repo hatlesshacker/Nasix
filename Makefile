@@ -8,6 +8,7 @@ EMU = qemu-system-i386
 
 OBJS =
 
+include lib/makefile
 include kernel/makefile
 include drivers/display/makefile
 include drivers/keyboard/makefile
