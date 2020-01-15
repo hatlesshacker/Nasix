@@ -14,7 +14,7 @@ include drivers/keyboard/makefile
 include boot/makefile
 
 ## **** The kernel bootable image ****
-image : kernel.bin scripts/grub.cfg
+kernel.iso : kernel.bin scripts/grub.cfg
 	echo "** Creating Bootable Image.."
 	mkdir -p isodir
 	mkdir -p isodir/boot
@@ -39,6 +39,6 @@ kernel.bin: scripts/link.ld $(OBJS)
 clean:
 	rm -rf isodir $(OBJS) *.bin *.iso
 
-test:
+test: kernel.iso
 	echo "** Testing Nasix with qemu."
 	$(EMU) -cdrom kernel.iso
