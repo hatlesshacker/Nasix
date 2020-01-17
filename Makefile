@@ -20,6 +20,7 @@ kernel.iso : kernel.bin scripts/grub.cfg
 	mkdir -p isodir
 	mkdir -p isodir/boot
 	cp kernel.bin isodir/boot/kernel.bin
+	cp initrd/initrd.sys isodir/initrd.sys
 	mkdir -p isodir/boot/grub
 	cp scripts/grub.cfg isodir/boot/grub/grub.cfg
 	grub-mkrescue -o kernel.iso isodir
