@@ -64,6 +64,9 @@ void kmain(multiboot_info_t *mboot_ptr) {
         printk("failed to load initrd.", 1);
     }
 
+#define MULTIBOOT_INFO_MEMORY 0x00000001
+#define MULTIBOOT_INFO_MODS   0x00000008
+
     printk("Determining amount of available RAM... \n");
     if ((mboot_ptr->flags & MULTIBOOT_INFO_MEMORY) == 0)
         printk("bootloader did not set memory flags.\n");

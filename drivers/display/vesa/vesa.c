@@ -31,64 +31,20 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <kernel.h>
-#include <stdint.h>
-#include <display/screen.h>
+#include <multiboot.h>
 #include <display/vesa.h>
 
-#define RGB16(r, g, b) ((b & 31) | ((g & 63) << 5 | ((r & 31) << 11)))
+static vbe_control_info_t *vbe_control;
+static vbe_mode_info_t *vbe_mode;
 
-void init_vesa_struct() {
-    regs16_t *regx = 0x4000;
-    VbeInfoBlock *VIB = 0x2000;
-    ModeInfoBlock *MIB = 0x3000;
-}
-VbeInfoBlock *get_vbeiblock() {
-    VbeInfoBlock *ret;
-    ret = 0x2000;
-    return ret;
-}
-ModeInfoBlock *get_miblock() {
-    ModeInfoBlock *ret;
-    ret = 0x3000;
-    return ret;
-}
-regs16_t *get_vesareg() {
-    regs16_t *ret;
-    ret = 0x4000;
-    return ret;
+static unsigned int* vbe_framebuffer;
+
+void vbe_init(multiboot_info_t *multiboot) {
+    vbe_control = (vbe_control_info_t *) multiboot->vbe_control_info;
+    vbe_mode = (vbe_mode_info_t *) multiboot->vbe_mode_info;
+    vbe_framebuffer = (unsigned int *) vbe_mode->phys_base_ptr;
 }
 
-int init_vesa() {
-    get_vbeiblock()->VbeSignature[0] = 'V';
-    get_vbeiblock()->VbeSignature[1] = 'B';
-    get_vbeiblock()->VbeSignature[2] = 'E';
-    get_vbeiblock()->VbeSignature[3] = '2';
-    get_vbeiblock()->VbeVersion = 0x0200;
-
-    get_vesareg()->ax = 0x4F00;
-    get_vesareg()->es = 0x0;
-    get_vesareg()->di = 0x2000;
-    int32_call(0x10, *get_vesareg());
-}
-
-int get_vbe_modeinfo(uint16_t mode) {
-    if (mode < 0x100)
-        return 0;
-    get_vesareg()->ax = 0x4F01;
-    get_vesareg()->cx = mode;
-    get_vesareg()->es = 0x0;
-    get_vesareg()->di = 0x3000;
-    int32_call(0x10, *get_vesareg());
-
-    printk("Info for VBE mode %x:\n", mode);
-    printk("Start of Linear frame Buffer: %x\n", get_miblock()->physbase);
-    printk("%d Bits per pixel.\n", get_miblock()->bpp);
-    printk("Screen resolution: %dx%d", get_miblock()->Xres, get_miblock()->Yres);
-}
-
-void set_vbe_mode(uint16_t mode) {
-    get_vesareg()->ax = 0x4F02;
-    get_vesareg()->bx = mode;
-    int32_call(0x10, *get_vesareg());
+void vbe_putpixel(unsigned short x, unsigned short y, unsigned char r, unsigned char g, unsigned char b) {
+    vbe_framebuffer[(vbe_mode->x_resolution * y) + x] = (r << 16 | g << 8 | b << 0 | 0xCC << 24);
 }
