@@ -1,0 +1,6 @@
+install:
+- sudo apt-get install nasm gcc grub-common xorriso
+
+script:
+  - make clean
+  - make
