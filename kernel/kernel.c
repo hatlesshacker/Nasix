@@ -36,17 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <display/screen.h>
 #include <multiboot.h>
 
-//FIXME:: LibFalcon already has these exact implementations, still
-//        we have to implement these here anyhow. Fix This.
-inline void outportb (unsigned short _port, unsigned char _data) {
-    asm volatile ("outb %1, %0" : : "dN" (_port), "a" (_data));
-}
-unsigned char inportb (unsigned short _port) {
-    unsigned char rv;
-    __asm__ __volatile__ ("inb %1, %0" : "=a" (rv) : "dN" (_port));
-    return rv;
-}
-
 void kmain(multiboot_info_t *mboot_ptr) {
     multiboot_module_t *mod = mboot_ptr->mods_addr;
     uint32_t contig_strt = 0x100000;
