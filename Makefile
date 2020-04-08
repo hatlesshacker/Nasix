@@ -1,5 +1,13 @@
+#
+#
+# Makefile for Nasix Kernel.
+# Assuming Libfalcon is installed under /usr/.
+#
+
+
+FALCON = /usr/
 CC = gcc
-CFLAGS = -m32 -nostdlib -nostdinc -w -I./include
+CFLAGS = -m32 -nostdlib -nostdinc -w -I./include/ -I$(FALCON)/include/libfalcon/
 AS = nasm
 ASF = -f elf
 LINKER = ld 
@@ -27,8 +35,8 @@ kernel.iso : kernel.bin scripts/grub.cfg
 	echo "** Build Successfull."
 
 kernel.bin: scripts/link.ld $(OBJS)
-	echo "** Linking Stuffs Together.."
-	$(LINKER) $(LINKERFLAGS) -o kernel.bin $(OBJS) lib/libfalcon.a
+	echo "** Linking Stuffs Together.." #ASSUMING LIBFALCON IS INSTALLED IN /USR/LIB/
+	$(LINKER) $(LINKERFLAGS) -o kernel.bin $(OBJS) -L$(FALCON)/lib/ -lfalcon
 
 %.o: %.c
 	@echo "  CC       $@"
