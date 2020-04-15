@@ -32,53 +32,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include <kernel.h>
-#include <keyboard/kb.h>
-#include <display/screen.h>
-#include <multiboot.h>
 #include <timer.h>
+#include <display/screen.h>
+#include <kernel/x86.h>
 
-void kmain(multiboot_info_t *mboot_ptr) {
-    multiboot_module_t *mod = mboot_ptr->mods_addr;
-    uint32_t contig_strt = 0x100000;
 
-    gdt_install();
-    idt_install();
-    isrs_install();
-    irq_install();
-    timer_init();
-    asm volatile ("sti");
-    keyboard_install();
-    cls();
+/* How many ticks has the system received. */
+static long timer_ticks;
 
-    printk("CPU Vendor: %s\n", get_cpuvendor());
-    if (mboot_ptr->mods_count <= 0) {
-        printk("failed to load initrd.", 1);
-    }
+/* Handler for the timer interrupt (0x20). */
+static void timer_int_handler(struct regs *r)
+{
+    //printk("T:%d\n", timer_ticks);
+    timer_ticks++;
+}
 
-#define MULTIBOOT_INFO_MEMORY 0x00000001
-#define MULTIBOOT_INFO_MODS   0x00000008
+/* Initialize the timer. */
+void timer_init()
+{
+	timer_ticks = 0;
+	//irq_install_handler(0x20, timer_int_handler);
+    irq_install_handler(0, timer_int_handler);
+}
 
-    printk("Determining amount of available RAM... \n");
-    if ((mboot_ptr->flags & MULTIBOOT_INFO_MEMORY) == 0)
-        printk("bootloader did not set memory flags.\n");
-    printk("%lu KB conventional memory, %lu MB extended memory.\n",
-           (mboot_ptr->mem_lower), (mboot_ptr->mem_upper)/1024);
-
-    printk("%d usable pages.\n",
-           (mboot_ptr->mem_upper - mboot_ptr->mem_lower) / 8);
-
-    printk("%d modules are loaded.\n", mboot_ptr->mods_count);
-    if (mboot_ptr->flags & MULTIBOOT_INFO_MODS) {
-        for (int i = 0; i < mboot_ptr->mods_count; i++) {
-            int j = 1;
-            printk("** Module No. %d is loaded at 0x%x.\n", j, (mod[i]).mod_start);
-            contig_strt += ((mod[i]).mod_end) - ((mod[i]).mod_start);
-            j++;
-        }
-    } else {
-        printk("bootloader did not set module flags.");
-    }
-    printk("Contiguous memory starts from 0x%x.\n", contig_strt);
-
-    for (;;);
+/* Count how many ticks has the OS received since last init. */
+long timer_get_ticks()
+{
+	return timer_ticks;
 }

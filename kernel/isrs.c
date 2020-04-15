@@ -145,8 +145,10 @@ unsigned char *exception_messages[] = {
 
 void fault_handler(struct regs *r) {
     if (r->int_no < 32) {
-        kputs(exception_messages[r->int_no]);
-        kputs(" Exception. System Halted!\n");
+        //kputs(exception_messages[r->int_no]);
+        //kputs(" Exception. System Halted!\n");
+        printk(exception_messages[r->int_no]);
+        printk(" Exception. System Halted!\n");
         for (;;);
     }
 }

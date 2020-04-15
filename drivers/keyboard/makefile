@@ -1,1 +1,0 @@
-OBJS += drivers/keyboard/kb.o

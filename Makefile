@@ -18,8 +18,7 @@ OBJS =
 
 include lib/makefile
 include kernel/makefile
-include drivers/display/makefile
-include drivers/keyboard/makefile
+include drivers/makefile
 include boot/makefile
 
 ## **** The kernel bootable image ****
