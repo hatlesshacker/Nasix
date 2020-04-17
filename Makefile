@@ -6,8 +6,8 @@
 
 
 FALCON = /usr/
-CC = gcc
-CFLAGS = -m32 -nostdlib -nostdinc -w -I./include/ -I$(FALCON)/include/libfalcon/
+CC = /prog/bin/i686-elf-gcc
+CFLAGS = -m32 -nostdlib -nostdinc -w -I./include/ -I$(FALCON)/include/libfalcon/ -std=gnu99
 AS = nasm
 ASF = -f elf
 LINKER = ld 

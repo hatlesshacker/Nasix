@@ -32,19 +32,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include <multiboot.h>
+#include <kernel.h>
 #include <display/vesa.h>
 
-static vbe_control_info_t *vbe_control;
-static vbe_mode_info_t *vbe_mode;
-
-static unsigned int* vbe_framebuffer;
+regs16_t regx;
+VbeInfoBlock* VIB = 0x2000;
+ModeInfoBlock* MIB = 0x3000;
 
 void vbe_init(multiboot_info_t *multiboot) {
-    vbe_control = (vbe_control_info_t *) multiboot->vbe_control_info;
-    vbe_mode = (vbe_mode_info_t *) multiboot->vbe_mode_info;
-    vbe_framebuffer = (unsigned int *) vbe_mode->phys_base_ptr;
-}
+    VIB -> VbeSignature[0] = 'V';
+    VIB -> VbeSignature[1] = 'B';
+    VIB -> VbeSignature[2] = 'E';
+    VIB -> VbeSignature[3] = '2';
+    VIB -> VbeVersion = 0x0200;
 
-void vbe_putpixel(unsigned short x, unsigned short y, unsigned char r, unsigned char g, unsigned char b) {
-    vbe_framebuffer[(vbe_mode->x_resolution * y) + x] = (r << 16 | g << 8 | b << 0 | 0xCC << 24);
+    regx.ax = 0x4F00;
+    regx.es = 0x0;
+    regx.di = 0x2000;
+    int32_call (0x10, regx);
 }

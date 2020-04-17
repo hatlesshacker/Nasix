@@ -33,78 +33,47 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <multiboot.h>
 
-typedef struct vbe_control_info {
-	char vbe_signature[4];
-	unsigned short vbe_version;
-	unsigned int vbe_oem_string_ptr;
-	unsigned int vbe_capabilities;
-	unsigned int vbe_video_mode_ptr;
-	unsigned short vbe_total_memory;
-	unsigned short vbe_oem_software_rev;
-	unsigned int vbe_oem_vendor_name_ptr;
-	unsigned int vbe_oem_product_name_ptr;
-	unsigned int vbe_oem_product_rev_ptr;
-	unsigned char vbe_reserved[222];
-	char vbe_oem_data[256];
-} __attribute__((packed)) vbe_control_info_t;
+#define RGB16(r,g,b) ((b&31) | ((g&63) << 5 | ((r&31) << 11)))
 
-typedef struct vbe_mode_info {
-	// Basic VBE
-	unsigned short mode_attributes;
-	unsigned char win_a_attributes;
-	unsigned char win_b_attributes;
-	unsigned short win_granularity;
-	unsigned short win_size;
-	unsigned short win_a_segment;
-	unsigned short win_b_segment;
-	unsigned int win_func_ptr;
-	unsigned short bytes_per_scanline;
+typedef struct VbeInfoBlock
+{
+    char VbeSignature[4];             // == "VESA"
+    uint16_t VbeVersion;                 // == 0x0300 for VBE 3.0
+    uint16_t OemStringPtr[2];            // isa vbeFarPtr
+    uint8_t Capabilities[4];
+    uint16_t* VideoModePtr;         // isa vbeFarPtr
+    uint16_t TotalMemory;             // as # of 64KB blocks
+    uint16_t oem_software_revision;
+	uint32_t oem_vendor_name_string;
+	uint32_t oem_product_name_string;
+	uint32_t oem_product_revision_string;
+	uint8_t	 reserved[222];
+    uint8_t	 oem_data[256];
+}VbeInfoBlock;
 
-	// VBE 1.2+
-	unsigned short x_resolution;
-	unsigned short y_resolution;
-	unsigned char x_char_size;
-	unsigned char y_char_size;
-	unsigned char number_of_planes;
-	unsigned char bits_per_pixel;
-	unsigned char number_of_banks;
-	unsigned char memory_model;
-	unsigned char bank_size;
-	unsigned char number_of_image_panes;
-	unsigned char reserved_vbe12;
+typedef struct ModeInfoBlock
+{
+  uint16_t attributes;
+  uint8_t winA,winB;
+  uint16_t granularity;
+  uint16_t winsize;
+  uint16_t segmentA, segmentB;
+  //FARPTR realFctPtr;
+  unsigned int win_func_ptr;
+  uint16_t pitch; // bytes per scanline
 
-	// Direct Color Modes
-	unsigned char red_mask_size;
-	unsigned char red_field_position;
-	unsigned char green_mask_size;
-	unsigned char green_field_position;
-	unsigned char blue_mask_size;
-	unsigned char blue_field_position;
-	unsigned char rsvd_mask_size;
-	unsigned char rsvd_field_position;
-	unsigned char direct_color_mode_info;
+  uint16_t Xres, Yres;
+  uint8_t Wchar, Ychar, planes, bpp, banks;
+  uint8_t memory_model, bank_size, image_pages;
+  uint8_t reserved0;
 
-	// VBE 2.0+
-	unsigned int phys_base_ptr;
-	unsigned int reserved_20_1;
-	unsigned short reserved_20_2;
+  uint8_t red_mask, red_position;
+  uint8_t green_mask, green_position;
+  uint8_t blue_mask, blue_position;
+  uint8_t rsv_mask, rsv_position;
+  uint8_t directcolor_attributes;
 
-	// VBE 3.0+
-	unsigned short lin_bytes_per_scanline;
-	unsigned char bnk_number_of_image_pages;
-	unsigned char lin_number_of_image_pages;
-	unsigned char lin_red_mask_size;
-	unsigned char lin_red_field_position;
-	unsigned char lin_green_mask_size;
-	unsigned char lin_green_field_position;
-	unsigned char lin_blue_mask_size;
-	unsigned char lin_blue_field_position;
-	unsigned char lin_rsvd_mask_size;
-	unsigned char lin_rsvd_field_position;
-	unsigned int max_pixel_clock;
-
-	unsigned char reserved[189];
-} __attribute__((packed)) vbe_mode_info_t;
-
-void vbe_init(multiboot_info_t* mboot);
-void vbe_putpixel(unsigned short x, unsigned short y, unsigned char r, unsigned char g, unsigned char b);
+  uint32_t physbase;  // LFB (Linear Framebuffer) address
+  uint32_t reserved1;
+  uint16_t reserved2;
+}ModeInfoBlock;
