@@ -46,7 +46,7 @@ void kmain(multiboot_info_t *mboot_ptr) {
     isrs_install();
     irq_install();
     timer_init();
-    asm volatile ("sti");
+    __asm__ __volatile__ ("sti");
     keyboard_install();
     cls();
 

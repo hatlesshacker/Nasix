@@ -35,19 +35,32 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <kernel.h>
 #include <display/vesa.h>
 
-regs16_t regx;
 VbeInfoBlock* VIB = 0x2000;
 ModeInfoBlock* MIB = 0x3000;
 
 void vbe_init(multiboot_info_t *multiboot) {
-    VIB -> VbeSignature[0] = 'V';
-    VIB -> VbeSignature[1] = 'B';
-    VIB -> VbeSignature[2] = 'E';
-    VIB -> VbeSignature[3] = '2';
-    VIB -> VbeVersion = 0x0200;
+    regs16_t regx;
+    VIB->VbeSignature[0] = 'V';
+    VIB->VbeSignature[1] = 'B';
+    VIB->VbeSignature[2] = 'E';
+    VIB->VbeSignature[3] = '2';
+    VIB->VbeVersion = 0x0200;
 
     regx.ax = 0x4F00;
     regx.es = 0x0;
     regx.di = 0x2000;
-    int32_call (0x10, regx);
+    rmcall (0x10, &regx);
+}
+
+int get_vbe_modeinfo(uint16_t mode)
+{
+    regs16_t regx;
+    
+    regx.ax = 0x4F01;
+    regx.cx = mode;
+    regx.es = 0x0;
+    regx.di = 0x3000;
+
+    rmcall (0x10, &regx);
+
 }
