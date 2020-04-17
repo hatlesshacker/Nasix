@@ -63,4 +63,7 @@ int get_vbe_modeinfo(uint16_t mode)
 
     rmcall (0x10, &regx);
 
+    printk("showing information of VBE mode 0x%x..\n", mode);
+    printk("start of LFB: 0x%x\n", MIB -> physbase);
+    printk("%d Bits Per pixel\n", (uint16_t)MIB->bpp);
 }

@@ -45,7 +45,7 @@ void kmain(multiboot_info_t *mboot_ptr) {
     idt_install();
     isrs_install();
     irq_install();
-    timer_init();
+    //timer_init();
     __asm__ __volatile__ ("sti");
     keyboard_install();
     cls();
@@ -79,6 +79,9 @@ void kmain(multiboot_info_t *mboot_ptr) {
         printk("bootloader did not set module flags.");
     }
     printk("Contiguous memory starts from 0x%x.\n", contig_strt);
+
+    vbe_init();
+    get_vbe_modeinfo(0x10D);
 
     for (;;);
 }
